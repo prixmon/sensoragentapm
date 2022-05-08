@@ -3,6 +3,7 @@ package prixmonsensoragentapm
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -44,6 +45,7 @@ func FinilizeMetric(methodName string) time.Duration {
 	methodRunDuration := time.Since(sensorAPMData[methodName])
 	// HTTP or HTTPS
 	//in case of any other web server errors returns Communicator result
+	fmt.Println("Log for: " + methodName)
 	go submitToCommunicator(methodName, methodRunDuration)
 	// Clear Selected Metric
 	delete(sensorAPMData, methodName)
