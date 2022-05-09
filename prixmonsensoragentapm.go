@@ -46,16 +46,16 @@ func FinilizeMetric(methodName string) time.Duration {
 	// HTTP or HTTPS
 	//in case of any other web server errors returns Communicator result
 	fmt.Println("Log for: " + methodName)
-	go submitToCommunicator(methodName, methodRunDuration)
+	go submitToCommunicator(methodName, methodRunDuration, sensorAPMData[methodName], time.Now())
 	// Clear Selected Metric
 	delete(sensorAPMData, methodName)
 	return methodRunDuration
 }
 
-func submitToCommunicator(methodName string, methodRunDuration time.Duration) {
+func submitToCommunicator(methodName string, methodRunDuration time.Duration, startTime, EndTime time.Time) {
 	authData := bytes.NewBuffer([]byte(`U=` + prvSensorAPMID.Username + "&P=" + prvSensorAPMID.Password))
 
-	communicatorURL := prvSensorAPMID.SensorAgentCommunicatorURL + "/saveapm?oid=" + prvSensorAPMID.OwnerId + "&pid=" + url.QueryEscape(prvSensorAPMID.ProjectId) + "&pm=" + url.QueryEscape(methodName) + "&tm=" + strconv.FormatInt(methodRunDuration.Milliseconds(), 10)
+	communicatorURL := prvSensorAPMID.SensorAgentCommunicatorURL + "/saveapm?oid=" + prvSensorAPMID.OwnerId + "&pid=" + url.QueryEscape(prvSensorAPMID.ProjectId) + "&pm=" + url.QueryEscape(methodName) + "&tm=" + strconv.FormatInt(methodRunDuration.Milliseconds(), 10) + "&st=" + startTime.Format("2006-01-02 15:04") + "&et=" + EndTime.Format("2006-01-02 15:04")
 
 	if prvSensorAPMID.IsSecure {
 		communicatorURL = "https://" + communicatorURL
